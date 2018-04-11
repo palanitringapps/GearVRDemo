@@ -1,5 +1,10 @@
 package tringapps.com.gearvrdemoifg;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 
 import org.gearvrf.GVRActivity;
@@ -11,6 +16,8 @@ import org.gearvrf.GVRTexture;
 
 public class VrActivity extends GVRActivity {
 
+    private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,6 +27,24 @@ public class VrActivity extends GVRActivity {
          * It will be displayed when app starts
          */
         setMain(new Main());
+        startScreenCapture();
+    }
+
+    @TargetApi(21)
+    private void startScreenCapture() {
+
+        MediaProjectionManager mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        startActivityForResult(mediaProjectionManager.createScreenCaptureIntent(), CAPTURE_PERMISSION_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,Intent data) {
+        if (requestCode != CAPTURE_PERMISSION_REQUEST_CODE || resultCode != Activity.RESULT_OK)
+            return;
+
+        Intent cbIntent =  new Intent(this, MirroringService.class);
+        cbIntent.putExtra(Constants.SCREEN_DATA, data);
+        startService(cbIntent);
     }
 
     private final class Main extends GVRMain {
@@ -36,6 +61,8 @@ public class VrActivity extends GVRActivity {
 
             //Add rectangle to the scene
             gvrContext.getMainScene().addSceneObject(quad);
+
+
         }
 
         @Override
