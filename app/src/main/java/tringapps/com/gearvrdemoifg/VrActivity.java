@@ -8,25 +8,21 @@ import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 
 import org.gearvrf.GVRActivity;
-import org.gearvrf.GVRAndroidResource;
-import org.gearvrf.GVRContext;
-import org.gearvrf.GVRMain;
-import org.gearvrf.GVRSceneObject;
-import org.gearvrf.GVRTexture;
+import org.gearvrf.GVRScene;
 
-public class VrActivity extends GVRActivity {
 
+public class VrActivity extends GVRActivity implements EventEndListener {
+
+    private SampleMain main;
     private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /**
-         * Set Main Scene
-         * It will be displayed when app starts
-         */
-        setMain(new Main());
+        main = new SampleMain(this, this);
+        setMain(main, "gvr.xml");
+
         if(!Singleton.getInstance().isScreenCaptureStarted()) {
             Singleton.getInstance().setScreenCaptureStarted(true);
             startScreenCapture();
@@ -50,32 +46,12 @@ public class VrActivity extends GVRActivity {
         startService(cbIntent);
     }
 
-    private final class Main extends GVRMain {
+    @Override
+    public void changeMainScene(GVRScene mainScene) {
 
-        @Override
-        public void onInit(GVRContext gvrContext) throws Throwable {
+        getGVRContext().getMainScene().clear();
+        main.loadBallon(getGVRContext());
+        getGVRContext().setMainScene(main.mScene);
 
-            //Load texture
-            GVRTexture texture = gvrContext.getAssetLoader().loadTexture(new GVRAndroidResource(gvrContext, R.drawable.__default_splash_screen__));
-
-            //Create a rectangle with the texture we just loaded
-            GVRSceneObject quad = new GVRSceneObject(gvrContext, 4, 2, texture);
-            quad.getTransform().setPosition(0, 0, -3);
-
-            //Add rectangle to the scene
-            gvrContext.getMainScene().addSceneObject(quad);
-
-
-        }
-
-        @Override
-        public SplashMode getSplashMode() {
-            return SplashMode.NONE;
-        }
-
-        @Override
-        public void onStep() {
-            //Add update logic here
-        }
     }
 }
