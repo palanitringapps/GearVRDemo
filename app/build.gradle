@@ -15,14 +15,17 @@ allprojects {
     }
 }
 android {
-    compileSdkVersion 25
+    compileSdkVersion 27
     defaultConfig {
         applicationId "tringapps.com.gearvrdemoifg"
         minSdkVersion 21
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi-v7a"
+        }
     }
     buildTypes {
         release {
@@ -35,6 +38,10 @@ android {
         exclude 'lib/x86/libgvr.so'
         exclude 'lib/arm64-v8a/libgvr.so'
     }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
+    }
 }
 
 ext.gearvrfVersion='4.0.1-SNAPSHOT'
@@ -43,6 +50,13 @@ project.ext.jomlVersion = "1.9.3-SNAPSHOT"
 project.ext.gsonVersion = '2.8.2'
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
     implementation "com.google.code.gson:gson:$gsonVersion"
     implementation "org.joml:joml-android:${jomlVersion}"
@@ -57,7 +71,6 @@ dependencies {
     }
     implementation 'org.greenrobot:eventbus:3.1.1'
     implementation 'org.webrtc:google-webrtc:1.0.+'
-
 
 }
 

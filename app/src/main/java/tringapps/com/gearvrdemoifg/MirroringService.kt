@@ -36,7 +36,6 @@ class MirroringService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        sdpConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         EventBus.getDefault().register(this)
     }
 
@@ -50,7 +49,7 @@ class MirroringService : Service() {
     fun onMessageEvent(message: SocketMessage) {
         when {
             message.state.equals(SocketIO.ANSWER, ignoreCase = true) -> onAnswerReceived(message.message as JSONObject)
-            message.state.equals(SocketIO.CANDIDATE, ignoreCase = true) -> onRemoteIceCandidateReceived(message.message as JSONObject)
+            message.state.equals(SocketIO.CANDIDATE, ignoreCase = true) -> onIceCandidateReceived(message.message as JSONObject)
             else -> {
             }
         }
@@ -79,7 +78,7 @@ class MirroringService : Service() {
         localPeer = peerConnectionFactory.createPeerConnection(rtcConfig, object : CustomPeerConnectionObserver("localPeerCreation") {
             override fun onIceCandidate(iceCandidate: IceCandidate) {
                 super.onIceCandidate(iceCandidate)
-                onLocalIceCandidateReceived(iceCandidate)
+                onIceCandidateReceived(iceCandidate)
             }
 
         })
@@ -91,7 +90,6 @@ class MirroringService : Service() {
     private fun addStreamToLocalPeer() {
         //creating local mediastream
         val stream = peerConnectionFactory.createLocalMediaStream("102")
-        localVideoTrack!!.setEnabled(true)
         stream.addTrack(localVideoTrack)
         localPeer!!.addStream(stream)
     }
@@ -103,7 +101,7 @@ class MirroringService : Service() {
     private fun doCall() {
         // Create SDP constraints.
 
-
+        sdpConstraints.mandatory.add(MediaConstraints.KeyValuePair("OfferToReceiveVideo", "true"))
         localPeer!!.createOffer(object : CustomSdpObserver("localCreateOffer") {
             override fun onCreateSuccess(sessionDescription: SessionDescription) {
                 super.onCreateSuccess(sessionDescription)
@@ -117,7 +115,7 @@ class MirroringService : Service() {
     /**
      * Received local ice candidate. Send it to remote peer through signalling for negotiation
      */
-    fun onLocalIceCandidateReceived(iceCandidate: IceCandidate) {
+    fun onIceCandidateReceived(iceCandidate: IceCandidate) {
         //we have received ice candidate. We can set it to the other peer.
         SocketIO.instance.emitIceCandidate(iceCandidate)
     }
@@ -125,7 +123,7 @@ class MirroringService : Service() {
     /**
      * Received remote ice candidate.
      */
-    private fun onRemoteIceCandidateReceived(data: JSONObject) {
+    private fun onIceCandidateReceived(data: JSONObject) {
         try {
             localPeer!!.addIceCandidate(IceCandidate(data.getString("id"), data.getInt("label"), data.getString("candidate")))
         } catch (e: JSONException) {
@@ -153,17 +151,20 @@ class MirroringService : Service() {
         })
     }
 
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val videoCapturerAndroid: VideoCapturer? = createScreenCapturer(intent.getParcelableExtra(SCREEN_DATA))
-        if (videoCapturerAndroid != null) {
-            val videoSource = peerConnectionFactory.createVideoSource(videoCapturerAndroid)
-            localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource)
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if(intent!=null) {
+            val videoCapturerAndroid: VideoCapturer? = createScreenCapturer(intent.getParcelableExtra(SCREEN_DATA))
+            if (videoCapturerAndroid != null) {
+                localVideoTrack = peerConnectionFactory.createVideoTrack("100", peerConnectionFactory.createVideoSource(videoCapturerAndroid))
+                videoCapturerAndroid.startCapture(200, 120, 30)
+                localVideoTrack!!.setEnabled(true)
+            }
+            onTryToStart()
+        }else{
+            stopSelf()
         }
-        videoCapturerAndroid!!.startCapture(1024, 720, 30)
-        onTryToStart()
-        return Service.START_STICKY
+        return Service.START_NOT_STICKY
 
     }
 
 }
-

@@ -19,13 +19,17 @@
         android:theme="@style/GVRfAppTheme"
         tools:replace="android:icon">
 
-        <meta-data android:name="com.samsung.android.vr.application.mode" android:value="vr_only"/>
+        <meta-data
+            android:name="com.samsung.android.vr.application.mode"
+            android:value="vr_only" />
 
-        <activity android:name=".VrActivity"
-            android:screenOrientation="landscape"
-            android:launchMode="singleTask"
+        <activity
+            android:name=".VrActivity"
             android:enableVrMode="@string/gvr_vr_mode_component"
-            android:resizeableActivity="false">
+            android:launchMode="singleTask"
+            android:configChanges="orientation|screenSize"
+            android:resizeableActivity="false"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

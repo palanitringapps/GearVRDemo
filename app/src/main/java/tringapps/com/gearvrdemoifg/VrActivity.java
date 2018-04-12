@@ -27,7 +27,10 @@ public class VrActivity extends GVRActivity {
          * It will be displayed when app starts
          */
         setMain(new Main());
-        startScreenCapture();
+        if(!Singleton.getInstance().isScreenCaptureStarted()) {
+            Singleton.getInstance().setScreenCaptureStarted(true);
+            startScreenCapture();
+        }
     }
 
     @TargetApi(21)
