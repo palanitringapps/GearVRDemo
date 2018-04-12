@@ -244,7 +244,6 @@ public class SampleMain extends GVRMain {
                 controller.stopDrag();
                 movingObject = null;
             }
-            //mainScene.clear();
             listener.changeMainScene(mainScene);
             Log.i("sdnfcvdjcnkd ", "jhcgbdeked ffdv");
         }
@@ -289,21 +288,6 @@ public class SampleMain extends GVRMain {
     private void attachBoundsCollider(GVRSceneObject sceneObject) {
         sceneObject.attachComponent(new GVRMeshCollider(mGVRContext, true));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

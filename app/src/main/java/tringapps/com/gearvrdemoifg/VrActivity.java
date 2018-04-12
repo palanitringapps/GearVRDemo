@@ -22,6 +22,7 @@ public class VrActivity extends GVRActivity implements EventEndListener {
     @Override
     public void changeMainScene(GVRScene mainScene) {
 
+        getGVRContext().getMainScene().clear();
         main.loadBallon(getGVRContext());
         getGVRContext().setMainScene(main.mScene);
 
