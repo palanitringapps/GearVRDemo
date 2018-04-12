@@ -29,6 +29,7 @@
         framebufferPixelsWide="DEFAULT"
         showLoadingIcon="true"
         useProtectedFramebuffer="false"
+        useControllerTypes="gaze,gamepad,mouse,controller"
         useSrgbFramebuffer="false" >
 
         <mono-mode-parms
@@ -40,8 +41,8 @@
             resetWindowFullScreen="true" />
 
         <performance-parms
-            cpuLevel="1"
-            gpuLevel="1" />
+            cpuLevel="2"
+            gpuLevel="2" />
 
         <eye-buffer-parms
             colorFormat="COLOR_8888"
