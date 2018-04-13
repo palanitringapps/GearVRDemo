@@ -1,12 +1,10 @@
 package tringapps.com.gearvrdemoifg
 
 import android.util.Log
-
-import org.greenrobot.eventbus.EventBus
-
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.IceCandidate
@@ -68,6 +66,7 @@ class SocketIO private constructor() {
                     type.equals(OFFER, ignoreCase = true)
                             || type.equals(ANSWER, ignoreCase = true)
                             || type.equals(CANDIDATE, ignoreCase = true)
+                            || type.equals(GAME, ignoreCase = true)
                     -> EventBus.getDefault().post(SocketMessage(type, message))
 
                 }
@@ -125,10 +124,10 @@ class SocketIO private constructor() {
         const val DISCONNECTED = "disconnected"
         const val ERROR = "error"
         const val NEW_MESSAGE = "new message"
-        const val OFFER="offer"
-        const val ANSWER="answer"
-        const val CANDIDATE="candidate"
-
+        const val OFFER = "offer"
+        const val ANSWER = "answer"
+        const val CANDIDATE = "candidate"
+        const val GAME = "game"
 
         val instance: SocketIO
             get() = SingletonHelper.INSTANCE
