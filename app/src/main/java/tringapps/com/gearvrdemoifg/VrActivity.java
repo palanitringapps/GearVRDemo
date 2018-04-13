@@ -21,10 +21,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class VrActivity extends GVRActivity implements EventEndListener  {
+public class VrActivity extends GVRActivity implements EventEndListener {
 
     private static final int CAPTURE_PERMISSION_REQUEST_CODE = 1;
     private SampleMain main;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -39,12 +40,12 @@ public class VrActivity extends GVRActivity implements EventEndListener  {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onMessageEvent(SocketMessage message) {
-        if (message.getState().equals(SocketIO.GAME)){
-            JSONObject game= (JSONObject) message.getMessage();
+        if (message.getState().equals(SocketIO.GAME)) {
+            JSONObject game = (JSONObject) message.getMessage();
             try {
-                if(game.getString(SocketIO.MESSAGE).equals(Constants.START)){
+                if (game.getString(SocketIO.MESSAGE).equals(Constants.START)) {
                     loadGame();
-                }else if(game.getString(SocketIO.MESSAGE).equals(Constants.STOP)){
+                } else if (game.getString(SocketIO.MESSAGE).equals(Constants.STOP)) {
                     loadSplash();
                 }
             } catch (JSONException e) {
@@ -59,10 +60,10 @@ public class VrActivity extends GVRActivity implements EventEndListener  {
         super.onCreate(savedInstanceState);
 
         main = new SampleMain(this, this);
-        setMain(new Main());
+        setMain(main);
 
 
-        if(!Singleton.getInstance().isScreenCaptureStarted()) {
+        if (!Singleton.getInstance().isScreenCaptureStarted()) {
             Singleton.getInstance().setScreenCaptureStarted(true);
             startScreenCapture();
         }
@@ -76,24 +77,24 @@ public class VrActivity extends GVRActivity implements EventEndListener  {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode,Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != CAPTURE_PERMISSION_REQUEST_CODE || resultCode != Activity.RESULT_OK)
             return;
 
-        Intent cbIntent =  new Intent(this, MirroringService.class);
+        Intent cbIntent = new Intent(this, MirroringService.class);
         cbIntent.putExtra(Constants.SCREEN_DATA, data);
         startService(cbIntent);
     }
 
 
-    public void loadSplash(){
-        getGVRContext().getMainScene().clear();
-        main.loadSplash(getGVRContext());
-    }
-
-    public void loadGame(){
+    public void loadSplash() {
         getGVRContext().getMainScene().clear();
         main.loadGame(getGVRContext());
+    }
+
+    public void loadGame() {
+        getGVRContext().getMainScene().clear();
+        main.loadBallon(getGVRContext());
     }
 
 

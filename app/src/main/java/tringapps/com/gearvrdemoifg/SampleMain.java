@@ -81,7 +81,8 @@ public class SampleMain extends GVRMain {
     public void onInit(GVRContext gvrContext) throws Throwable {
 
         //Load texture
-       loadSplash(gvrContext);
+       //loadSplash(gvrContext);
+        loadGame(getGVRContext());
 
     }
 
@@ -89,13 +90,13 @@ public class SampleMain extends GVRMain {
     public void loadSplash(GVRContext gvrContext){
         GVRTexture texture = gvrContext.getAssetLoader().loadTexture(new GVRAndroidResource(gvrContext, R.drawable.__default_splash_screen__));
 
-        //Create a rectangle with the texture we just loaded
+//Create a rectangle with the texture we just loaded
+
+        mainScene = mGVRContext.getMainScene();
         GVRSceneObject quad = new GVRSceneObject(gvrContext, 4, 2, texture);
         quad.getTransform().setPosition(0, 0, -3);
 
-        //Add rectangle to the scene
-
-        mainScene = mGVRContext.getMainScene();
+//Add rectangle to the scene
         mainScene.addSceneObject(quad);
 
     }
@@ -267,8 +268,8 @@ public class SampleMain extends GVRMain {
                 controller.stopDrag();
                 movingObject = null;
             }
-            listener.changeMainScene(mainScene);
-            Log.i("sdnfcvdjcnkd ", "jhcgbdeked ffdv");
+            //listener.changeMainScene(mainScene);
+            //Log.i("sdnfcvdjcnkd ", "jhcgbdeked ffdv");
         }
 
         public void onInside(GVRSceneObject sceneObj, GVRPicker.GVRPickedObject pickInfo) {
