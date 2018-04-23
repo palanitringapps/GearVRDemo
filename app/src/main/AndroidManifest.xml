@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="tringapps.com.gearvrdemoifg">
 
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -27,7 +28,7 @@
             android:name=".VrActivity"
             android:enableVrMode="@string/gvr_vr_mode_component"
             android:launchMode="singleTask"
-            android:configChanges="orientation|screenSize"
+            android:configChanges="density|keyboardHidden|navigation|orientation|screenSize|uiMode"
             android:resizeableActivity="false"
             android:screenOrientation="landscape">
             <intent-filter>
@@ -36,7 +37,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".MirroringService" />
+        <service android:name=".MirroringService"/>
     </application>
 
 </manifest>

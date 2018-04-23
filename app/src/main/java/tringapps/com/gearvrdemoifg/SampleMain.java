@@ -78,26 +78,28 @@ public class SampleMain extends GVRMain {
 
 
     @Override
-    public void onInit(GVRContext gvrContext) throws Throwable {
+    public void onInit(GVRContext gvrContext) {
 
         //Load texture
-       //loadSplash(gvrContext);
-        loadGame(getGVRContext());
-
+       loadSplash(gvrContext);
     }
 
 
-    public void loadSplash(GVRContext gvrContext){
+    public void loadSplash(GVRContext gvrContext)  {
+        mainScene = gvrContext.getMainScene();
+        mainScene.setBackgroundColor(1, 1, 1, 1);
+
         GVRTexture texture = gvrContext.getAssetLoader().loadTexture(new GVRAndroidResource(gvrContext, R.drawable.__default_splash_screen__));
 
-//Create a rectangle with the texture we just loaded
+        // create a scene object (this constructor creates a rectangular scene
+        // object that uses the standard texture shader
+        GVRSceneObject sceneObject = new GVRSceneObject(gvrContext, 4.0f, 2.0f, texture);
 
-        mainScene = mGVRContext.getMainScene();
-        GVRSceneObject quad = new GVRSceneObject(gvrContext, 4, 2, texture);
-        quad.getTransform().setPosition(0, 0, -3);
+        // set the scene object position
+        sceneObject.getTransform().setPosition(0.0f, 0.0f, -3.0f);
 
-//Add rectangle to the scene
-        mainScene.addSceneObject(quad);
+        // add the scene object to the scene graph
+        mainScene.addSceneObject(sceneObject);
 
     }
 

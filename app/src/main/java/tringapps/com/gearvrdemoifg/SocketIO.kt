@@ -9,6 +9,14 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.IceCandidate
 import org.webrtc.SessionDescription
+import tringapps.com.gearvrdemoifg.Constants.ANSWER
+import tringapps.com.gearvrdemoifg.Constants.CANDIDATE
+import tringapps.com.gearvrdemoifg.Constants.CHAT
+import tringapps.com.gearvrdemoifg.Constants.CONNECTED
+import tringapps.com.gearvrdemoifg.Constants.DISCONNECTED
+import tringapps.com.gearvrdemoifg.Constants.ERROR
+import tringapps.com.gearvrdemoifg.Constants.GAME
+import tringapps.com.gearvrdemoifg.Constants.OFFER
 
 class SocketIO private constructor() {
     private var socket: Socket? = null
@@ -16,7 +24,6 @@ class SocketIO private constructor() {
 
     private val onConnect = Emitter.Listener {
         isConnected = true
-        socket!!.emit(MESSAGE, "Hi from android ")
         onMessageReceived(CONNECTED, CONNECTED)
     }
 
@@ -27,7 +34,7 @@ class SocketIO private constructor() {
 
     private val onConnectError = Emitter.Listener { onMessageReceived(ERROR, ERROR) }
 
-    private val onNewMessage = Emitter.Listener { args -> onMessageReceived(NEW_MESSAGE, args[0]) }
+    private val onMessage = Emitter.Listener { args -> onMessageReceived(CHAT, args[0]) }
 
 
     private object SingletonHelper {
@@ -38,7 +45,7 @@ class SocketIO private constructor() {
         try {
             socket = IO.socket(Constants.CHAT_SERVER_URL)
             socket!!.on(Socket.EVENT_CONNECT, onConnect)
-                    .on(MESSAGE, onNewMessage)
+                    .on(CHAT, onMessage)
                     .on(Socket.EVENT_CONNECT_ERROR, onConnectError)
                     .on(Socket.EVENT_DISCONNECT, onDisconnect)
             socket!!.connect()
@@ -81,7 +88,7 @@ class SocketIO private constructor() {
 
     fun emitMessage(message: String) {
         if (isConnected) {
-            socket!!.emit(MESSAGE, message)
+            socket!!.emit(CHAT, message)
         }
     }
 
@@ -93,7 +100,7 @@ class SocketIO private constructor() {
                 obj.put("type", message.type.canonicalForm())
                 obj.put("sdp", message.description)
                 Log.d("emitMessage", obj.toString())
-                socket!!.emit("message", obj)
+                socket!!.emit(CHAT, obj)
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -109,7 +116,7 @@ class SocketIO private constructor() {
                 `object`.put("label", iceCandidate.sdpMLineIndex)
                 `object`.put("id", iceCandidate.sdpMid)
                 `object`.put("candidate", iceCandidate.sdp)
-                socket!!.emit("message", `object`)
+                socket!!.emit(CHAT, `object`)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -119,15 +126,6 @@ class SocketIO private constructor() {
     companion object {
 
         private val TAG = SocketIO::class.java.name
-        const val MESSAGE = "message"
-        const val CONNECTED = "connected"
-        const val DISCONNECTED = "disconnected"
-        const val ERROR = "error"
-        const val NEW_MESSAGE = "new message"
-        const val OFFER = "offer"
-        const val ANSWER = "answer"
-        const val CANDIDATE = "candidate"
-        const val GAME = "game"
 
         val instance: SocketIO
             get() = SingletonHelper.INSTANCE

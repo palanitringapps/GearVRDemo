@@ -11,9 +11,17 @@ import org.greenrobot.eventbus.ThreadMode
 import org.json.JSONException
 import org.json.JSONObject
 import org.webrtc.*
+import tringapps.com.gearvrdemoifg.Constants.ANSWER
+import tringapps.com.gearvrdemoifg.Constants.CANDIDATE
 import tringapps.com.gearvrdemoifg.Constants.SCREEN_DATA
 
 class MirroringService : Service() {
+
+    companion object {
+        @JvmStatic
+        var isScreenCaptureStarted = false
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
@@ -33,6 +41,7 @@ class MirroringService : Service() {
     var isInitiator: Boolean = true
     private var peerIceServers: MutableList<PeerConnection.IceServer> = ArrayList()
     private val sdpConstraints = MediaConstraints()
+    private lateinit var videoCapturerAndroid: VideoCapturer
 
     override fun onCreate() {
         super.onCreate()
@@ -42,14 +51,17 @@ class MirroringService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        isScreenCaptureStarted = false
+        videoCapturerAndroid.stopCapture()
+        localPeer!!.close()
         EventBus.getDefault().unregister(this)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onMessageEvent(message: SocketMessage) {
         when {
-            message.state.equals(SocketIO.ANSWER, ignoreCase = true) -> onAnswerReceived(message.message as JSONObject)
-            message.state.equals(SocketIO.CANDIDATE, ignoreCase = true) -> onIceCandidateReceived(message.message as JSONObject)
+            message.state.equals(ANSWER, ignoreCase = true) -> onAnswerReceived(message.message as JSONObject)
+            message.state.equals(CANDIDATE, ignoreCase = true) -> onIceCandidateReceived(message.message as JSONObject)
             else -> {
             }
         }
@@ -152,19 +164,18 @@ class MirroringService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if(intent!=null) {
-            val videoCapturerAndroid: VideoCapturer? = createScreenCapturer(intent.getParcelableExtra(SCREEN_DATA))
-            if (videoCapturerAndroid != null) {
-                localVideoTrack = peerConnectionFactory.createVideoTrack("100", peerConnectionFactory.createVideoSource(videoCapturerAndroid))
-                videoCapturerAndroid.startCapture(200, 120, 30)
-                localVideoTrack!!.setEnabled(true)
-            }
+        if (intent != null) {
+            videoCapturerAndroid = createScreenCapturer(intent.getParcelableExtra(SCREEN_DATA))
+            localVideoTrack = peerConnectionFactory.createVideoTrack("100", peerConnectionFactory.createVideoSource(videoCapturerAndroid))
+            videoCapturerAndroid.startCapture(480, 360, 30)
+            localVideoTrack!!.setEnabled(true)
             onTryToStart()
-        }else{
+        } else {
             stopSelf()
         }
         return Service.START_NOT_STICKY
 
     }
+
 
 }
